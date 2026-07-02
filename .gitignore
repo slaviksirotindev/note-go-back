@@ -1,0 +1,15 @@
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+__debug_bin
+/___go_build_*
+
+.env
+
+.idea/
+*.iml
+
+# Логи
+*.log
