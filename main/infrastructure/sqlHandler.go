@@ -1,8 +1,12 @@
 package infrastructure
 
 import (
+	"fmt"
+	"log"
 	"notes/main/domain"
+	"os"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -12,13 +16,35 @@ type SqlHandler struct {
 }
 
 func NewSqlHandler() *SqlHandler {
-	dsn := "host=localhost user=postgres password=20021216bur dbname=note port=5432 sslmode=disable"
+	if err := godotenv.Load(); err != nil {
+		log.Println("Предупреждение: Файл .env не найден, используются системные переменные окружения")
+	}
+
+	host := os.Getenv("DB_HOST")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	port := os.Getenv("DB_PORT")
+
+	if host == "" || user == "" || dbName == "" {
+		log.Fatal("Критическая ошибка: Переменные окружения для БД (DB_HOST, DB_USER, DB_NAME) не заданы. Проверь файл .env")
+	}
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
+		host, user, password, dbName, port)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		log.Fatal("Failed to connect to database" + err.Error())
 	}
-	db.AutoMigrate(&domain.Note{})
-	return &SqlHandler{db: db}
+
+	sqlHandler := &SqlHandler{db: db}
+
+	if err := db.AutoMigrate(&domain.Note{}); err != nil {
+		log.Fatal("Failed to migrate db table" + err.Error())
+	}
+
+	return sqlHandler
 }
 
 func (handler *SqlHandler) Create(note *domain.Note) error {

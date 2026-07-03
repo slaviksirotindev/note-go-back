@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"notes/main/interfeces/api"
+	"os"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,5 +16,9 @@ func Init() {
 	e.GET("/notes", noteController.FindAll)
 	e.DELETE("/notes/:id", noteController.DeleteById)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	e.Logger.Fatal(e.Start(":" + port))
 }
