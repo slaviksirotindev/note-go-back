@@ -13,7 +13,7 @@ func Init() {
 
 	e.POST("/notes", noteController.CreateNode)
 	e.GET("/notes", noteController.FindAll)
-	e.DELETE("/notes", noteController.DeleteById)
+	e.DELETE("/notes/:id", noteController.DeleteById)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
