@@ -10,9 +10,13 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /notes-app main/server.go
 
 FROM alpine:latest
-WORKDIR /
-COPY --from=builder /notes-app /notes-app
+
+WORKDIR /app
+
+COPY --from=builder /notes-app ./notes-app
+
+COPY main/infrastructure/migrations ./migrations
 
 EXPOSE 8080
 
-CMD ["/notes-app"]
+CMD ["./notes-app"]

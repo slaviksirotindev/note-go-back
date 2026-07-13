@@ -18,6 +18,9 @@ import (
 func Init() {
 	e := echo.New()
 	sqlHandler := NewSqlHandler()
+	if err := RunMigration(sqlHandler); err != nil {
+		e.Logger.Fatalf("Failed to run migrations: %v", err)
+	}
 	noteController := api.NewNoteController(sqlHandler)
 
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
